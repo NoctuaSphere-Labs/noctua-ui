@@ -1,0 +1,90 @@
+import 'package:flutter/material.dart';
+import 'package:game_ui/widgets/neon_icon.dart';
+
+const apps = [
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.local_fire_department,
+    color: Colors.white,
+    hoverColor: Colors.red,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.shield,
+    color: Colors.white,
+    hoverColor: Colors.blue,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.access_time_sharp,
+    color: Colors.white,
+    hoverColor: Colors.green,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.favorite,
+    color: Colors.white,
+    hoverColor: Colors.pink,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.star,
+    color: Colors.white,
+    hoverColor: Colors.amber,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.bolt,
+    color: Colors.white,
+    hoverColor: Colors.yellow,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.music_note,
+    color: Colors.white,
+    hoverColor: Colors.purple,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.cloud,
+    color: Colors.white,
+    hoverColor: Colors.lightBlue,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.eco,
+    color: Colors.white,
+    hoverColor: Colors.lightGreen,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.wb_sunny,
+    color: Colors.white,
+    hoverColor: Colors.orange,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.water_drop,
+    color: Colors.white,
+    hoverColor: Colors.cyan,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+  NeonIcon(
+    icon: Icons.diamond,
+    color: Colors.white,
+    hoverColor: Colors.teal,
+    size: 75,
+  ),
+  SizedBox(width: 16),
+];
