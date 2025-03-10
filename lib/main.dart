@@ -4,8 +4,20 @@ import 'package:game_ui/dummy_data/apps.dart';
 import 'package:game_ui/widgets/admins.dart';
 import 'package:game_ui/widgets/draggable.dart';
 import 'package:game_ui/widgets/nav_bar.dart';
+import 'dart:html' as html;
+import 'dart:async';
+
+
+final streamController = StreamController();
 
 void main() {
+  html.window.onMessage.listen((event) {
+    final data = event.data; 
+    if (data is Map) {
+      streamController.add(data);
+    }
+  });
+
   runApp(const MyApp());
 }
 
