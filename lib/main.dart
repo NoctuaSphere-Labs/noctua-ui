@@ -1,4 +1,5 @@
 import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:game_ui/dummy_data/apps.dart';
 import 'package:game_ui/widgets/admins.dart';
@@ -6,7 +7,32 @@ import 'package:game_ui/widgets/draggable.dart';
 import 'package:game_ui/widgets/nav_bar.dart';
 
 void main() {
-  runApp(const MyApp());
+  final runnableApp = _buildRunnableApp(
+    isWeb: kIsWeb,
+    webAppWidth: 1920.0,
+    app: const MyApp(),
+  );
+
+  runApp(runnableApp);
+}
+
+Widget _buildRunnableApp({
+  required bool isWeb,
+  required double webAppWidth,
+  required Widget app,
+}) {
+  if (!isWeb) {
+    return app;
+  }
+
+  return Center(
+    child: ClipRect(
+      child: SizedBox(
+        width: webAppWidth,
+        child: app,
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
