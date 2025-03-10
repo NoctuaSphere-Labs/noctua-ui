@@ -80,6 +80,8 @@ class MyHomePage extends StatelessWidget {
           const Align(
             alignment: Alignment.bottomCenter,
             child: NavBar(
+              iconWidth: 91, // Icon width + Spacing
+              iconLength: 12, // Number of icons
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: apps,
