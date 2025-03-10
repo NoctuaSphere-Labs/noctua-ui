@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 
 class DraggableContainer extends StatefulWidget {
   final Widget child;
-  final Widget feedback;
 
   const DraggableContainer({
     super.key,
     required this.child,
-    required this.feedback,
   });
 
   @override
@@ -100,7 +98,7 @@ class _DraggableContainerState extends State<DraggableContainer> {
                 feedback: SizedBox(
                   width: _width,
                   height: _height,
-                  child: _started ? widget.feedback : widget.child,
+                  child: widget.child,
                 ),
                 onDragStarted: () {
                   // Only start dragging if we're not resizing
@@ -131,7 +129,22 @@ class _DraggableContainerState extends State<DraggableContainer> {
                 child: SizedBox(
                   width: _width,
                   height: _height,
-                  child: _started ? widget.feedback : widget.child,
+                  child: _started
+                      ? Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            widget.child,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white70,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              height: _height,
+                              width: _width,
+                            )
+                          ],
+                        )
+                      : widget.child,
                 ),
               ),
               // Corner resize handles

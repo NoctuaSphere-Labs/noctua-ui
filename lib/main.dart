@@ -72,20 +72,6 @@ class MyHomePage extends StatelessWidget {
                   ),
                 ),
                 DraggableContainer(
-                  feedback: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      adminsWidget,
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white70,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        height: 240,
-                        width: 440,
-                      )
-                    ],
-                  ),
                   child: adminsWidget,
                 ),
               ],
