@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:blurrycontainer/blurrycontainer.dart';
 
 class DraggableContainer extends StatefulWidget {
   final Widget child;
@@ -160,7 +161,13 @@ class _DraggableContainerState extends State<DraggableContainer> {
                             )
                           ],
                         )
-                      : widget.child,
+                      // If maximized, wrap child in a white Container
+                      : _isMaximized
+                          ? Container(
+                              color: Color(0xff212121),
+                              child: _wrapChildForMaximized(),
+                            )
+                          : widget.child,
                 ),
               ),
               // macOS window control buttons
@@ -280,51 +287,77 @@ class _DraggableContainerState extends State<DraggableContainer> {
 
   // Handler for minimize button
   void _handleMinimize() {
-    // setState(() {
-    //   if (_isMinimized) {
-    //     // Restore
-    //     _height = _originalSize?.height ?? 240;
-    //     _isMinimized = false;
-    //   } else {
-    //     // Minimize
-    //     _originalSize = Size(_width, _height);
-    //     _height = 40; // Minimize to just show the title bar
-    //     _isMinimized = true;
+    setState(() {
+      if (_isMinimized) {
+        // Restore
+        _height = _originalSize?.height ?? 240;
+        _isMinimized = false;
+      } else {
+        // Minimize
+        _originalSize = Size(_width, _height);
+        _height = 40; // Minimize to just show the title bar
+        _isMinimized = true;
 
-    //     // If maximized, un-maximize
-    //     if (_isMaximized) {
-    //       _handleMaximize();
-    //     }
-    //   }
-    // });
+        // If maximized, un-maximize
+        if (_isMaximized) {
+          _handleMaximize();
+        }
+      }
+    });
   }
 
   // Handler for maximize button
   void _handleMaximize() {
-    // final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.of(context).size;
 
-    // setState(() {
-    //   if (_isMaximized) {
-    //     // Restore original size and position
-    //     _width = _originalSize?.width ?? 440;
-    //     _height = _originalSize?.height ?? 240;
-    //     _position = _originalPosition;
-    //     _isMaximized = false;
-    //   } else {
-    //     // Save original size and position
-    //     _originalSize = Size(_width, _height);
-    //     _originalPosition = _position;
+    setState(() {
+      if (_isMaximized) {
+        // Restore original size and position
+        _width = _originalSize?.width ?? 440;
+        _height = _originalSize?.height ?? 240;
+        _position = _originalPosition;
+        _isMaximized = false;
+      } else {
+        // Save original size and position
+        _originalSize = Size(_width, _height);
+        _originalPosition = _position;
 
-    //     // Maximize to screen size
-    //     _width = screenSize.width;
-    //     _height = screenSize.height;
-    //     _position = const Offset(0, 0);
-    //     _isMaximized = true;
+        // Maximize to screen size
+        _width = screenSize.width;
+        _height = screenSize.height;
+        _position = const Offset(0, 0);
+        _isMaximized = true;
 
-    //     // If minimized, un-minimize
-    //     _isMinimized = false;
-    //   }
-    // });
+        // If minimized, un-minimize
+        _isMinimized = false;
+      }
+    });
+  }
+
+  // Helper to extract and modify child content when maximized
+  Widget _wrapChildForMaximized() {
+    // Check if the child is a padding with BlurryContainer
+    if (widget.child is Padding) {
+      final paddingWidget = widget.child as Padding;
+      final paddingValue = paddingWidget.padding;
+
+      // Extract the ListView or other content from the BlurryContainer
+      if (paddingWidget.child is BlurryContainer) {
+        final blurryContainer = paddingWidget.child as BlurryContainer;
+
+        // Return a normal Container with the same padding and the BlurryContainer's child
+        return Padding(
+          padding: paddingValue,
+          child: Container(
+            padding: blurryContainer.padding,
+            child: blurryContainer.child,
+          ),
+        );
+      }
+    }
+
+    // If we couldn't extract the content, just return the original child
+    return widget.child;
   }
 
   // Get the direction to resize based on mouse position
