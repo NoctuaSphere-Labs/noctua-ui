@@ -1,4 +1,5 @@
 import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:game_ui/dummy_data/apps.dart';
 import 'package:game_ui/widgets/admins.dart';
@@ -11,6 +12,12 @@ import 'dart:async';
 final streamController = StreamController();
 
 void main() {
+  final runnableApp = _buildRunnableApp(
+    isWeb: kIsWeb,
+    webAppWidth: 1920.0,
+    app: const MyApp(),
+  );
+  
   html.window.onMessage.listen((event) {
     final data = event.data; 
     if (data is Map) {
@@ -18,7 +25,26 @@ void main() {
     }
   });
 
-  runApp(const MyApp());
+  runApp(runnableApp);
+}
+
+Widget _buildRunnableApp({
+  required bool isWeb,
+  required double webAppWidth,
+  required Widget app,
+}) {
+  if (!isWeb) {
+    return app;
+  }
+
+  return Center(
+    child: ClipRect(
+      child: SizedBox(
+        width: webAppWidth,
+        child: app,
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -84,20 +110,6 @@ class MyHomePage extends StatelessWidget {
                   ),
                 ),
                 DraggableContainer(
-                  feedback: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      adminsWidget,
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white70,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        height: 240,
-                        width: 440,
-                      )
-                    ],
-                  ),
                   child: adminsWidget,
                 ),
               ],
@@ -106,6 +118,8 @@ class MyHomePage extends StatelessWidget {
           const Align(
             alignment: Alignment.bottomCenter,
             child: NavBar(
+              iconWidth: 91, // Icon width + Spacing
+              iconLength: 12, // Number of icons
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: apps,

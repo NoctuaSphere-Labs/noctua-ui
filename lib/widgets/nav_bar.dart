@@ -4,8 +4,15 @@ import 'package:flutter/gestures.dart';
 
 class NavBar extends StatefulWidget {
   final Widget child;
+  final double iconWidth;
+  final double iconLength;
 
-  const NavBar({super.key, required this.child});
+  const NavBar({
+    super.key,
+    required this.child,
+    required this.iconWidth,
+    required this.iconLength,
+  });
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -25,15 +32,19 @@ class _NavBarState extends State<NavBar> {
     return Stack(
       alignment: Alignment.center,
       children: [
-        BlurryContainer(
-          blur: 8,
-          height: 140,
-          width: double.infinity,
-          elevation: 6,
-          padding: const EdgeInsets.all(32),
-          color: Colors.white.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(15),
-          child: const SizedBox.shrink(),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return BlurryContainer(
+              blur: 8,
+              height: 140,
+              width: widget.iconWidth * (widget.iconLength + 3),
+              elevation: 6,
+              padding: const EdgeInsets.all(32),
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(15),
+              child: const SizedBox.shrink(),
+            );
+          },
         ),
         Listener(
           onPointerSignal: (pointerSignal) {
