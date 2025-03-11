@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class DraggableContainer extends StatefulWidget {
   final Widget child;
+  final VoidCallback? onClose;
 
   const DraggableContainer({
     super.key,
     required this.child,
+    this.onClose,
   });
 
   @override
@@ -19,6 +21,20 @@ class _DraggableContainerState extends State<DraggableContainer> {
   double _height = 240;
   bool _isResizing = false;
   ResizeDirection _resizeDirection = ResizeDirection.none;
+  bool _isMinimized = false;
+  bool _isMaximized = false;
+  Size? _originalSize;
+  Offset? _originalPosition;
+
+  // Store the hover state for each button
+  bool _isRedHovered = false;
+  bool _isYellowHovered = false;
+  bool _isGreenHovered = false;
+
+  // Define constants for window control buttons
+  static const double _buttonSize = 12.0;
+  static const double _buttonSpacing = 8.0;
+  static const double _buttonMargin = 32.0;
 
   // Define constants for resize handle size
   static const double _handleSize = 10;
@@ -147,6 +163,8 @@ class _DraggableContainerState extends State<DraggableContainer> {
                       : widget.child,
                 ),
               ),
+              // macOS window control buttons
+              if (!_started) _buildMacOSButtons(),
               // Corner resize handles
               ..._buildCornerHandles(),
               // Edge resize handles
@@ -156,6 +174,157 @@ class _DraggableContainerState extends State<DraggableContainer> {
         ),
       ),
     );
+  }
+
+  // Build macOS style window control buttons
+  Widget _buildMacOSButtons() {
+    return Positioned(
+      top: _buttonMargin,
+      left: _buttonMargin,
+      child: Row(
+        children: [
+          // Close button (Red)
+          MouseRegion(
+            onEnter: (_) => setState(() => _isRedHovered = true),
+            onExit: (_) => setState(() => _isRedHovered = false),
+            child: GestureDetector(
+              onTap: _handleClose,
+              child: Container(
+                width: _buttonSize,
+                height: _buttonSize,
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(_buttonSize / 2),
+                  border: Border.all(
+                    color: Colors.red.shade800,
+                    width: 0.5,
+                  ),
+                ),
+                child: _isRedHovered
+                    ? const Icon(
+                        Icons.close,
+                        size: 8,
+                        color: Colors.black54,
+                      )
+                    : null,
+              ),
+            ),
+          ),
+          SizedBox(width: _buttonSpacing),
+          // Minimize button (Yellow)
+          MouseRegion(
+            onEnter: (_) => setState(() => _isYellowHovered = true),
+            onExit: (_) => setState(() => _isYellowHovered = false),
+            child: GestureDetector(
+              onTap: _handleMinimize,
+              child: Container(
+                width: _buttonSize,
+                height: _buttonSize,
+                decoration: BoxDecoration(
+                  color: Colors.yellow,
+                  borderRadius: BorderRadius.circular(_buttonSize / 2),
+                  border: Border.all(
+                    color: Colors.yellow.shade800,
+                    width: 0.5,
+                  ),
+                ),
+                child: _isYellowHovered
+                    ? const Icon(
+                        Icons.horizontal_rule,
+                        size: 12,
+                        color: Colors.black54,
+                      )
+                    : null,
+              ),
+            ),
+          ),
+          SizedBox(width: _buttonSpacing),
+          // Maximize button (Green)
+          MouseRegion(
+            onEnter: (_) => setState(() => _isGreenHovered = true),
+            onExit: (_) => setState(() => _isGreenHovered = false),
+            child: GestureDetector(
+              onTap: _handleMaximize,
+              child: Container(
+                width: _buttonSize,
+                height: _buttonSize,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(_buttonSize / 2),
+                  border: Border.all(
+                    color: Colors.green.shade800,
+                    width: 0.5,
+                  ),
+                ),
+                child: _isGreenHovered
+                    ? Icon(
+                        Icons.unfold_more,
+                        size: 8,
+                        color: Colors.black54,
+                      )
+                    : null,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Handler for close button
+  void _handleClose() {
+    if (widget.onClose != null) {
+      widget.onClose!();
+    }
+  }
+
+  // Handler for minimize button
+  void _handleMinimize() {
+    // setState(() {
+    //   if (_isMinimized) {
+    //     // Restore
+    //     _height = _originalSize?.height ?? 240;
+    //     _isMinimized = false;
+    //   } else {
+    //     // Minimize
+    //     _originalSize = Size(_width, _height);
+    //     _height = 40; // Minimize to just show the title bar
+    //     _isMinimized = true;
+
+    //     // If maximized, un-maximize
+    //     if (_isMaximized) {
+    //       _handleMaximize();
+    //     }
+    //   }
+    // });
+  }
+
+  // Handler for maximize button
+  void _handleMaximize() {
+    // final screenSize = MediaQuery.of(context).size;
+
+    // setState(() {
+    //   if (_isMaximized) {
+    //     // Restore original size and position
+    //     _width = _originalSize?.width ?? 440;
+    //     _height = _originalSize?.height ?? 240;
+    //     _position = _originalPosition;
+    //     _isMaximized = false;
+    //   } else {
+    //     // Save original size and position
+    //     _originalSize = Size(_width, _height);
+    //     _originalPosition = _position;
+
+    //     // Maximize to screen size
+    //     _width = screenSize.width;
+    //     _height = screenSize.height;
+    //     _position = const Offset(0, 0);
+    //     _isMaximized = true;
+
+    //     // If minimized, un-minimize
+    //     _isMinimized = false;
+    //   }
+    // });
   }
 
   // Get the direction to resize based on mouse position
