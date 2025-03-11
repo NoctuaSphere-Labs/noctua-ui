@@ -354,79 +354,145 @@ class _DraggableContainerState extends State<DraggableContainer> {
     const minWidth = 200.0;
     const minHeight = 150.0;
 
+    // Get the screen size
+    final screenSize = MediaQuery.of(context).size;
+    // Set maximum width and height to screen dimensions
+    final maxWidth = screenSize.width;
+    final maxHeight = screenSize.height;
+
     switch (_resizeDirection) {
       case ResizeDirection.topLeft:
         final newWidth = _width - delta.dx;
         final newHeight = _height - delta.dy;
-        if (newWidth >= minWidth) {
+        final newX = _position!.dx + delta.dx;
+        final newY = _position!.dy + delta.dy;
+
+        // Apply constraints with absolute limits
+        if (newWidth >= minWidth && newWidth <= maxWidth && newX >= 0) {
           _width = newWidth;
-          _position = Offset(_position!.dx + delta.dx, _position!.dy);
+          _position = Offset(newX, _position!.dy);
         }
-        if (newHeight >= minHeight) {
+
+        if (newHeight >= minHeight && newHeight <= maxHeight && newY >= 0) {
           _height = newHeight;
-          _position = Offset(_position!.dx, _position!.dy + delta.dy);
+          _position = Offset(_position!.dx, newY);
         }
         break;
+
       case ResizeDirection.topRight:
         final newWidth = _width + delta.dx;
         final newHeight = _height - delta.dy;
-        if (newWidth >= minWidth) {
+        final newY = _position!.dy + delta.dy;
+
+        // Apply constraints with absolute limits
+        if (newWidth >= minWidth && newWidth <= maxWidth) {
           _width = newWidth;
         }
-        if (newHeight >= minHeight) {
+
+        if (newHeight >= minHeight && newHeight <= maxHeight && newY >= 0) {
           _height = newHeight;
-          _position = Offset(_position!.dx, _position!.dy + delta.dy);
+          _position = Offset(_position!.dx, newY);
         }
         break;
+
       case ResizeDirection.bottomLeft:
         final newWidth = _width - delta.dx;
         final newHeight = _height + delta.dy;
-        if (newWidth >= minWidth) {
+        final newX = _position!.dx + delta.dx;
+
+        // Apply constraints with absolute limits
+        if (newWidth >= minWidth && newWidth <= maxWidth && newX >= 0) {
           _width = newWidth;
-          _position = Offset(_position!.dx + delta.dx, _position!.dy);
+          _position = Offset(newX, _position!.dy);
         }
-        if (newHeight >= minHeight) {
+
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
           _height = newHeight;
         }
         break;
+
       case ResizeDirection.bottomRight:
         final newWidth = _width + delta.dx;
         final newHeight = _height + delta.dy;
-        if (newWidth >= minWidth) {
+
+        // Apply constraints with absolute limits
+        if (newWidth >= minWidth && newWidth <= maxWidth) {
           _width = newWidth;
         }
-        if (newHeight >= minHeight) {
+
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
           _height = newHeight;
         }
         break;
+
       case ResizeDirection.left:
         final newWidth = _width - delta.dx;
-        if (newWidth >= minWidth) {
+        final newX = _position!.dx + delta.dx;
+
+        // Apply constraints with absolute limits
+        if (newWidth >= minWidth && newWidth <= maxWidth && newX >= 0) {
           _width = newWidth;
-          _position = Offset(_position!.dx + delta.dx, _position!.dy);
+          _position = Offset(newX, _position!.dy);
         }
         break;
+
       case ResizeDirection.right:
         final newWidth = _width + delta.dx;
-        if (newWidth >= minWidth) {
+
+        // Apply constraints with absolute limits
+        if (newWidth >= minWidth && newWidth <= maxWidth) {
           _width = newWidth;
         }
         break;
+
       case ResizeDirection.top:
         final newHeight = _height - delta.dy;
-        if (newHeight >= minHeight) {
+        final newY = _position!.dy + delta.dy;
+
+        // Apply constraints with absolute limits
+        if (newHeight >= minHeight && newHeight <= maxHeight && newY >= 0) {
           _height = newHeight;
-          _position = Offset(_position!.dx, _position!.dy + delta.dy);
+          _position = Offset(_position!.dx, newY);
         }
         break;
+
       case ResizeDirection.bottom:
         final newHeight = _height + delta.dy;
-        if (newHeight >= minHeight) {
+
+        // Apply constraints with absolute limits
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
           _height = newHeight;
         }
         break;
+
       case ResizeDirection.none:
         break;
+    }
+
+    // After resize, ensure container stays within screen bounds
+    _ensureContainerWithinScreen(screenSize);
+  }
+
+  // Helper method to ensure container is within screen bounds after resize
+  void _ensureContainerWithinScreen(Size screenSize) {
+    // If container is off the right edge
+    if (_position!.dx + _width > screenSize.width) {
+      _position = Offset(screenSize.width - _width, _position!.dy);
+    }
+
+    // If container is off the bottom edge
+    if (_position!.dy + _height > screenSize.height) {
+      _position = Offset(_position!.dx, screenSize.height - _height);
+    }
+
+    // If container is off the left edge (shouldn't happen, but just in case)
+    if (_position!.dx < 0) {
+      _position = Offset(0, _position!.dy);
+    }
+
+    // If container is off the top edge (shouldn't happen, but just in case)
+    if (_position!.dy < 0) {
+      _position = Offset(_position!.dx, 0);
     }
   }
 
