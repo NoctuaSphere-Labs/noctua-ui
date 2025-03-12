@@ -84,49 +84,67 @@ class MyHomePage extends StatelessWidget {
       ),
     );
     return Scaffold(
-      backgroundColor: const Color(0xff212121),
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
         title: Text(title),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              alignment: Alignment.center,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        padding: const EdgeInsets.only(left: 56.0, right: 56.0, bottom: 56.0),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(28.0),
+            topLeft: Radius.circular(28.0),
+            topRight: Radius.circular(28.0),
+            bottomRight: Radius.circular(28.0),
+          ),
+          child: Container(
+            color: const Color(0xff212121),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Positioned(
-                  top: 200,
-                  left: 10,
-                  child:
-                      GradientBall(colors: [Colors.deepOrange, Colors.amber]),
-                ),
-                const Positioned(
-                  top: 400,
-                  right: 10,
-                  child: GradientBall(
-                    size: Size.square(200),
-                    colors: [Colors.blue, Colors.purple],
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const Positioned(
+                        top: 200,
+                        left: 10,
+                        child: GradientBall(
+                            colors: [Colors.deepOrange, Colors.amber]),
+                      ),
+                      const Positioned(
+                        top: 400,
+                        right: 10,
+                        child: GradientBall(
+                          size: Size.square(200),
+                          colors: [Colors.blue, Colors.purple],
+                        ),
+                      ),
+                      DraggableContainer(
+                        child: adminsWidget,
+                      ),
+                    ],
                   ),
                 ),
-                DraggableContainer(
-                  child: adminsWidget,
+                const Align(
+                  alignment: Alignment.bottomCenter,
+                  child: NavBar(
+                    iconWidth: 91, // Icon width + Spacing
+                    iconLength: 12, // Number of icons
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: apps,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-          const Align(
-            alignment: Alignment.bottomCenter,
-            child: NavBar(
-              iconWidth: 91, // Icon width + Spacing
-              iconLength: 12, // Number of icons
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: apps,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
