@@ -85,15 +85,10 @@ class MyHomePage extends StatelessWidget {
     );
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(title),
-      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        padding: const EdgeInsets.only(left: 56.0, right: 56.0, bottom: 56.0),
+        padding: const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 4.0, top: 4.0),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(28.0),
