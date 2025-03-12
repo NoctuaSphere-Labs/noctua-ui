@@ -20,6 +20,7 @@ class NeonIcon extends StatefulWidget {
 
 class _NeonIconState extends State<NeonIcon> {
   bool isHovering = false;
+  bool isPressed = false;
 
   void onMouseRegionChanged(event) {
     setState(() {
@@ -29,38 +30,46 @@ class _NeonIconState extends State<NeonIcon> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: onMouseRegionChanged,
-      onExit: onMouseRegionChanged,
-      child: AnimatedContainer(
-          padding: EdgeInsets.zero,
+    final borderRadius = BorderRadius.circular(25);
+    final Color effectiveHoverColor = isPressed 
+        ? widget.hoverColor.withOpacity(0.7) 
+        : widget.hoverColor;
+        
+    final hoveringDecoration = BoxDecoration(
+      color: Colors.black45,
+      borderRadius: borderRadius,
+      boxShadow: [
+        BoxShadow(
+          color: effectiveHoverColor,
+          blurRadius: isPressed ? 40 : 60, // smaller blur when pressed
+          spreadRadius: isPressed ? 5 : 10, // smaller spread when pressed
+        ),
+      ],
+      border: Border.all(
+        color: widget.color,
+        width: 4,
+      ),
+    );
+    final notHoveringDecoration = BoxDecoration(
+      borderRadius: borderRadius,
+      border: Border.all(
+        color: widget.color,
+      ),
+    );
+    return GestureDetector(
+      onTapDown: (_) => setState(() => isPressed = true),
+      onTapUp: (_) => setState(() => isPressed = false),
+      onTapCancel: () => setState(() => isPressed = false),
+      child: MouseRegion(
+        onEnter: onMouseRegionChanged,
+        onExit: onMouseRegionChanged,
+        cursor: SystemMouseCursors.click,
+        child: AnimatedContainer(
           width: isHovering ? widget.size * 1.40 : widget.size * 1.25,
-          transform: Matrix4.rotationZ(0),
           transformAlignment: Alignment.center,
           clipBehavior: isHovering ? Clip.none : Clip.none,
           height: isHovering ? widget.size * 1.40 : widget.size * 1.25,
-          decoration: isHovering
-              ? BoxDecoration(
-                  color: Colors.black45,
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.hoverColor,
-                      blurRadius: 60, // soften the shadow
-                      spreadRadius: 10, //extend the shadow
-                    ),
-                  ],
-                  border: Border.all(
-                    color: widget.color,
-                    width: 4,
-                  ),
-                )
-              : BoxDecoration(
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(
-                    color: widget.color,
-                  ),
-                ),
+          decoration: isHovering ? hoveringDecoration : notHoveringDecoration,
           duration: const Duration(microseconds: 250),
           curve: Curves.fastOutSlowIn,
           child: SizedBox(
@@ -73,6 +82,7 @@ class _NeonIconState extends State<NeonIcon> {
             ),
           ),
         ),
+      ),
     );
   }
 }
