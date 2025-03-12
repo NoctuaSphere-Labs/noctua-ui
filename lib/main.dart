@@ -8,7 +8,20 @@ import 'package:game_ui/widgets/nav_bar.dart';
 import 'dart:html' as html;
 import 'dart:async';
 
+import 'package:game_ui/widgets/neon_icon.dart';
+
 final streamController = StreamController();
+
+// Model for app data with icon and color information
+class AppData {
+  final IconData icon;
+  final Color hoverColor;
+
+  const AppData({
+    required this.icon,
+    required this.hoverColor,
+  });
+}
 
 void main() {
   final runnableApp = _buildRunnableApp(
@@ -121,6 +134,11 @@ class MyHomePage extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // Row showing open apps
+                const OpenAppsRow(),
+
+                // Implement a row of the open tabs
                 Expanded(
                   child: Stack(
                     alignment: Alignment.center,
@@ -159,6 +177,118 @@ class MyHomePage extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class OpenAppsRow extends StatefulWidget {
+  const OpenAppsRow({super.key});
+
+  @override
+  State<OpenAppsRow> createState() => _OpenAppsRowState();
+}
+
+class _OpenAppsRowState extends State<OpenAppsRow> {
+  // List of open apps that can be modified
+  final List<AppData> _openApps = [
+    const AppData(
+      icon: Icons.local_fire_department,
+      hoverColor: Colors.red,
+    ),
+    const AppData(
+      icon: Icons.shield,
+      hoverColor: Colors.blue,
+    ),
+    const AppData(
+      icon: Icons.favorite,
+      hoverColor: Colors.pink,
+    ),
+  ];
+
+  // Remove an app from the list
+  void _removeApp(int index) {
+    setState(() {
+      _openApps.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80,
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      width: double.infinity,
+      child: BlurryContainer(
+        blur: 8,
+        elevation: 4,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        color: Colors.white.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Text(
+              "Open Apps:",
+              style: TextStyle(
+                color: Colors.white70,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Display open apps with X button
+            ..._openApps.asMap().entries.map((entry) {
+              final index = entry.key;
+              final app = entry.value;
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // App icon
+                    NeonIcon(
+                      icon: app.icon,
+                      color: Colors.white,
+                      hoverColor: app.hoverColor,
+                      size: 36,
+                    ),
+                    // X button for closing app
+                    Positioned(
+                      top: -8,
+                      right: -8,
+                      child: GestureDetector(
+                        onTap: () => _removeApp(index),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.close,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            const Spacer(),
+            // Add button to open new app
+          ],
         ),
       ),
     );
