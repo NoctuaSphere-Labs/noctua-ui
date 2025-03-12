@@ -114,7 +114,12 @@ class MyHomePage extends StatelessWidget {
             bottomRight: Radius.circular(28.0),
           ),
           child: Container(
-            color: const Color(0xff212121),
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/default_background.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -143,20 +148,6 @@ class MyHomePage extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      const Positioned(
-                        top: 200,
-                        left: 10,
-                        child: GradientBall(
-                            colors: [Colors.deepOrange, Colors.amber]),
-                      ),
-                      const Positioned(
-                        top: 400,
-                        right: 10,
-                        child: GradientBall(
-                          size: Size.square(200),
-                          colors: [Colors.blue, Colors.purple],
-                        ),
-                      ),
                       DraggableContainer(
                         child: adminsWidget,
                       ),
