@@ -8,7 +8,6 @@ import 'package:game_ui/widgets/nav_bar.dart';
 import 'dart:html' as html;
 import 'dart:async';
 
-
 final streamController = StreamController();
 
 void main() {
@@ -17,9 +16,9 @@ void main() {
     webAppWidth: 1920.0,
     app: const MyApp(),
   );
-  
+
   html.window.onMessage.listen((event) {
-    final data = event.data; 
+    final data = event.data;
     if (data is Map) {
       streamController.add(data);
     }
@@ -88,7 +87,12 @@ class MyHomePage extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        padding: const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 4.0, top: 4.0),
+        padding: const EdgeInsets.only(
+          left: 4.0,
+          right: 4.0,
+          bottom: 4.0,
+          // top: 4.0,
+        ),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(28.0),
@@ -101,6 +105,22 @@ class MyHomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  width: double.infinity,
+                  child: Center(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
                 Expanded(
                   child: Stack(
                     alignment: Alignment.center,
