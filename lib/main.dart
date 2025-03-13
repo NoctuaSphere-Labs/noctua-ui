@@ -159,10 +159,7 @@ class MyHomePage extends StatelessWidget {
                   child: NavBar(
                     iconWidth: 81, // Icon width + Spacing
                     iconLength: 12, // Number of icons
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: apps,
-                    ),
+                    children: apps,
                   ),
                 ),
               ],
