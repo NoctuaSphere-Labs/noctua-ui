@@ -65,21 +65,17 @@ class _NeonIconState extends State<NeonIcon> {
         onExit: onMouseRegionChanged,
         cursor: SystemMouseCursors.click,
         child: AnimatedContainer(
-          width: isHovering ? widget.size * 1.40 : widget.size * 1.25,
+          width: widget.size * 1.50,
           transformAlignment: Alignment.center,
-          clipBehavior: isHovering ? Clip.none : Clip.none,
-          height: isHovering ? widget.size * 1.40 : widget.size * 1.25,
+          clipBehavior: Clip.none,
+          height: widget.size * 1.50,
           decoration: isHovering ? hoveringDecoration : notHoveringDecoration,
           duration: const Duration(microseconds: 250),
           curve: Curves.fastOutSlowIn,
-          child: SizedBox(
-            width: widget.size,
-            height: widget.size,
-            child: Icon(
-              widget.icon,
-              color: widget.color,
-              size: widget.size,
-            ),
+          child: Icon(
+            widget.icon,
+            color: widget.color,
+            size: widget.size,
           ),
         ),
       ),
