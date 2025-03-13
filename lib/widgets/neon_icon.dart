@@ -5,6 +5,7 @@ class NeonIcon extends StatefulWidget {
   final Color color;
   final Color hoverColor;
   final double size;
+  final String? tooltip;
 
   const NeonIcon({
     super.key,
@@ -12,6 +13,7 @@ class NeonIcon extends StatefulWidget {
     required this.color,
     required this.hoverColor,
     this.size = 200,
+    this.tooltip,
   });
 
   @override
@@ -31,10 +33,9 @@ class _NeonIconState extends State<NeonIcon> {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(25);
-    final Color effectiveHoverColor = isPressed 
-        ? widget.hoverColor.withOpacity(0.7) 
-        : widget.hoverColor;
-        
+    final hoverColor = widget.hoverColor;
+    final pressedColor = hoverColor.withOpacity(0.7);
+    final Color effectiveHoverColor = isPressed ? pressedColor : hoverColor;
     final hoveringDecoration = BoxDecoration(
       color: Colors.black45,
       borderRadius: borderRadius,
@@ -56,7 +57,7 @@ class _NeonIconState extends State<NeonIcon> {
         color: widget.color,
       ),
     );
-    return GestureDetector(
+    final iconWidget = GestureDetector(
       onTapDown: (_) => setState(() => isPressed = true),
       onTapUp: (_) => setState(() => isPressed = false),
       onTapCancel: () => setState(() => isPressed = false),
@@ -80,5 +81,23 @@ class _NeonIconState extends State<NeonIcon> {
         ),
       ),
     );
+    final tooltipWidget = Tooltip(
+      message: widget.tooltip ?? '',
+      waitDuration: const Duration(seconds: 1),
+      decoration: BoxDecoration(
+        color: Colors.black87,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      textStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      preferBelow: false,
+      showDuration: const Duration(seconds: 2),
+      child: iconWidget,
+    );
+    return widget.tooltip != null ? tooltipWidget : iconWidget;
   }
 }

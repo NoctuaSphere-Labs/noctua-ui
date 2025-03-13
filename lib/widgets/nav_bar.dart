@@ -22,13 +22,15 @@ class NavBar extends StatelessWidget {
       padding: const EdgeInsets.all(32),
       color: Colors.white.withOpacity(0.15),
       borderRadius: BorderRadius.circular(15),
-      child: ListView(
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
-          // This prevents the shadow from being clipped
-          clipBehavior: Clip.none,
-          children: children,
-        ),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
+        // This prevents the shadow from being clipped
+        clipBehavior: Clip.none,
+        itemCount: children.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 16),
+        itemBuilder: (context, index) => children[index],
+      ),
     );
     return background;
   }
