@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:game_ui/widgets/app_window_buttons.dart';
 
 class DraggableContainer extends StatefulWidget {
   final Widget child;
@@ -25,16 +26,8 @@ class _DraggableContainerState extends State<DraggableContainer> {
   bool _isMinimized = false;
   bool _isMaximized = false;
   Size? _originalSize;
-  Offset? _originalPosition;
+  Offset? _originalPosition;  // Define constants for window control buttons
 
-  // Store the hover state for each button
-  bool _isRedHovered = false;
-  bool _isYellowHovered = false;
-  bool _isGreenHovered = false;
-
-  // Define constants for window control buttons
-  static const double _buttonSize = 12.0;
-  static const double _buttonSpacing = 8.0;
   static const double _buttonMargin = 32.0;
 
   // Define constants for resize handle size
@@ -171,7 +164,12 @@ class _DraggableContainerState extends State<DraggableContainer> {
                 ),
               ),
               // macOS window control buttons
-              if (!_started) _buildMacOSButtons(),
+              if (!_started)
+                const Positioned(
+                  top: _buttonMargin,
+                  left: _buttonMargin,
+                  child: AppWindowButtons(),
+                ),
               // Corner resize handles
               ..._buildCornerHandles(),
               // Edge resize handles
@@ -179,101 +177,6 @@ class _DraggableContainerState extends State<DraggableContainer> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  // Build macOS style window control buttons
-  Widget _buildMacOSButtons() {
-    return Positioned(
-      top: _buttonMargin,
-      left: _buttonMargin,
-      child: Row(
-        children: [
-          // Close button (Red)
-          MouseRegion(
-            onEnter: (_) => setState(() => _isRedHovered = true),
-            onExit: (_) => setState(() => _isRedHovered = false),
-            child: GestureDetector(
-              onTap: _handleClose,
-              child: Container(
-                width: _buttonSize,
-                height: _buttonSize,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(_buttonSize / 2),
-                  border: Border.all(
-                    color: Colors.red.shade800,
-                    width: 0.5,
-                  ),
-                ),
-                child: _isRedHovered
-                    ? const Icon(
-                        Icons.close,
-                        size: 8,
-                        color: Colors.black54,
-                      )
-                    : null,
-              ),
-            ),
-          ),
-          SizedBox(width: _buttonSpacing),
-          // Minimize button (Yellow)
-          MouseRegion(
-            onEnter: (_) => setState(() => _isYellowHovered = true),
-            onExit: (_) => setState(() => _isYellowHovered = false),
-            child: GestureDetector(
-              onTap: _handleMinimize,
-              child: Container(
-                width: _buttonSize,
-                height: _buttonSize,
-                decoration: BoxDecoration(
-                  color: Colors.yellow,
-                  borderRadius: BorderRadius.circular(_buttonSize / 2),
-                  border: Border.all(
-                    color: Colors.yellow.shade800,
-                    width: 0.5,
-                  ),
-                ),
-                child: _isYellowHovered
-                    ? const Icon(
-                        Icons.horizontal_rule,
-                        size: 12,
-                        color: Colors.black54,
-                      )
-                    : null,
-              ),
-            ),
-          ),
-          SizedBox(width: _buttonSpacing),
-          // Maximize button (Green)
-          MouseRegion(
-            onEnter: (_) => setState(() => _isGreenHovered = true),
-            onExit: (_) => setState(() => _isGreenHovered = false),
-            child: GestureDetector(
-              onTap: _handleMaximize,
-              child: Container(
-                width: _buttonSize,
-                height: _buttonSize,
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(_buttonSize / 2),
-                  border: Border.all(
-                    color: Colors.green.shade800,
-                    width: 0.5,
-                  ),
-                ),
-                child: _isGreenHovered
-                    ? Icon(
-                        Icons.unfold_more,
-                        size: 8,
-                        color: Colors.black54,
-                      )
-                    : null,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
