@@ -1,15 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
+import 'package:game_ui/utils/web_draggable.dart';
 import 'package:game_ui/widgets/app_window_buttons.dart';
 
 class DraggableContainer extends StatefulWidget {
   final Widget child;
   final VoidCallback? onClose;
+  final double? parentWidth;
+  final double? parentHeight;
 
   const DraggableContainer({
     super.key,
     required this.child,
     this.onClose,
+    this.parentWidth,
+    this.parentHeight,
   });
 
   @override
@@ -17,8 +24,9 @@ class DraggableContainer extends StatefulWidget {
 }
 
 class _DraggableContainerState extends State<DraggableContainer> {
-  bool _started = false;
-  Offset? _position;
+  Offset _position = const Offset(0, 0);
+  bool _isDragging = false;
+
   double _width = 440;
   double _height = 240;
   bool _isResizing = false;
@@ -26,9 +34,10 @@ class _DraggableContainerState extends State<DraggableContainer> {
   bool _isMinimized = false;
   bool _isMaximized = false;
   Size? _originalSize;
-  Offset? _originalPosition;  // Define constants for window control buttons
-
-  static const double _buttonMargin = 32.0;
+  StreamController<Offset> lastDraggedPosition =
+      StreamController<Offset>.broadcast();
+  final StreamController<Offset> mousePositionController =
+      StreamController<Offset>.broadcast();
 
   // Define constants for resize handle size
   static const double _handleSize = 10;
@@ -55,128 +64,104 @@ class _DraggableContainerState extends State<DraggableContainer> {
   }
 
   @override
+  void initState() {
+    lastDraggedPosition.stream.listen((offset) {
+      _position = offset;
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    _position ??= Offset(
-        screenSize.width / 2 - _width / 2, screenSize.height / 2 - _height / 2);
-
-    return Positioned(
-      top: _position!.dy,
-      left: _position!.dx,
-      child: MouseRegion(
-        cursor: _getCursor(_resizeDirection),
-        onHover: (event) {
-          if (!_isResizing) {
-            setState(() {
-              _resizeDirection = _getResizeDirection(event.localPosition);
-            });
-          }
-        },
-        onExit: (event) {
-          if (!_isResizing) {
-            setState(() {
-              _resizeDirection = ResizeDirection.none;
-            });
-          }
-        },
-        child: GestureDetector(
-          onPanStart: (details) {
-            final resizeDir = _getResizeDirection(details.localPosition);
-            setState(() {
-              if (resizeDir != ResizeDirection.none) {
-                _isResizing = true;
-                _resizeDirection = resizeDir;
-              }
-            });
-          },
-          onPanUpdate: (details) {
-            if (_isResizing) {
-              setState(() {
-                _handleResize(details.delta);
-              });
-            }
-          },
-          onPanEnd: (details) {
-            setState(() {
-              _isResizing = false;
-            });
-          },
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Draggable(
-                feedback: SizedBox(
-                  width: _width,
-                  height: _height,
-                  child: widget.child,
-                ),
-                onDragStarted: () {
-                  // Only start dragging if we're not resizing
-                  if (!_isResizing) {
-                    setState(() {
-                      if (!_started) _started = true;
-                    });
-                  }
-                },
-                onDragEnd: (details) {
-                  final screenSize = MediaQuery.of(context).size;
-                  // Calculate the proposed new position
-                  final newPosition = details.offset;
-
-                  // Calculate the bounds
-                  final maxX = screenSize.width - _width;
-                  final maxY = screenSize.height - _height;
-
-                  // Constrain the position within the screen bounds
-                  final constrainedX = newPosition.dx.clamp(0.0, maxX);
-                  final constrainedY = newPosition.dy.clamp(0.0, maxY);
-
-                  setState(() {
-                    if (_started) _started = false;
-                    _position = Offset(constrainedX, constrainedY);
-                  });
-                },
-                child: SizedBox(
-                  width: _width,
-                  height: _height,
-                  child: _started
-                      ? Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            widget.child,
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white70,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              height: _height,
-                              width: _width,
-                            )
-                          ],
-                        )
-                      // If maximized, wrap child in a white Container
-                      : _isMaximized
-                          ? Container(
-                              color: Color(0xff212121),
-                              child: _wrapChildForMaximized(),
-                            )
-                          : widget.child,
-                ),
-              ),
-              // macOS window control buttons
-              if (!_started)
-                const Positioned(
-                  top: _buttonMargin,
-                  left: _buttonMargin,
-                  child: AppWindowButtons(),
-                ),
-              // Corner resize handles
-              ..._buildCornerHandles(),
-              // Edge resize handles
-              ..._buildEdgeHandles(),
-            ],
-          ),
-        ),
+    return Listener(
+      onPointerMove: (event) {
+        mousePositionController.add(event.localPosition);
+      },
+      child: Stack(
+        children: [
+          StreamBuilder<Offset>(
+              stream: lastDraggedPosition.stream,
+              builder: (context, snapshot) {
+                return Positioned(
+                  top: snapshot.data?.dy ?? _position.dy,
+                  left: snapshot.data?.dx ?? _position.dx,
+                  child: MouseRegion(
+                    cursor: _getCursor(_resizeDirection),
+                    onHover: (event) {
+                      if (!_isResizing) {
+                        setState(() {
+                          _resizeDirection =
+                              _getResizeDirection(event.localPosition);
+                        });
+                      }
+                    },
+                    onExit: (event) {
+                      if (!_isResizing) {
+                        setState(() {
+                          _resizeDirection = ResizeDirection.none;
+                        });
+                      }
+                    },
+                    child: GestureDetector(
+                      onPanStart: (details) {
+                        final resizeDir =
+                            _getResizeDirection(details.localPosition);
+                        setState(() {
+                          if (resizeDir != ResizeDirection.none) {
+                            _isResizing = true;
+                            _resizeDirection = resizeDir;
+                          }
+                        });
+                      },
+                      onPanUpdate: (details) {
+                        if (_isResizing) {
+                          setState(() {
+                            _handleResize(details.delta);
+                          });
+                        }
+                      },
+                      onPanEnd: (details) {
+                        setState(() {
+                          _isResizing = false;
+                        });
+                      },
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          WebDraggable(
+                            parentWidth: widget.parentWidth!,
+                            parentHeight: widget.parentHeight!,
+                            width: _width,
+                            height: _height,
+                            shouldDrag: !_isResizing,
+                            lastDraggedPosition: lastDraggedPosition,
+                            mousePositionController:
+                                mousePositionController.stream,
+                            isDraggingListener: (isDragging) {
+                              setState(() {
+                                _isDragging = isDragging;
+                              });
+                            },
+                            child: widget.child,
+                          ),
+                          // macOS window control buttons
+                          if (!_isDragging)
+                            const Positioned(
+                              top: 32,
+                              left: 32,
+                              child: AppWindowButtons(),
+                            ),
+                          // Corner resize handles
+                          ..._buildCornerHandles(),
+                          // Edge resize handles
+                          ..._buildEdgeHandles(),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+        ],
       ),
     );
   }
@@ -218,12 +203,12 @@ class _DraggableContainerState extends State<DraggableContainer> {
         // Restore original size and position
         _width = _originalSize?.width ?? 440;
         _height = _originalSize?.height ?? 240;
-        _position = _originalPosition;
+        // _position = _originalPosition;
         _isMaximized = false;
       } else {
         // Save original size and position
         _originalSize = Size(_width, _height);
-        _originalPosition = _position;
+        // _originalPosition = _position;
 
         // Maximize to screen size
         _width = screenSize.width;

@@ -145,13 +145,18 @@ class MyHomePage extends StatelessWidget {
 
                 // Implement a row of the open tabs
                 Expanded(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      DraggableContainer(
-                        child: adminsWidget,
-                      ),
-                    ],
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SizedBox(
+                        width: constraints.maxWidth,
+                        height: constraints.maxHeight,
+                        child: DraggableContainer(
+                          parentWidth: constraints.maxWidth,
+                          parentHeight: constraints.maxHeight,
+                          child: adminsWidget,
+                        ),
+                      );
+                    }
                   ),
                 ),
                 const Align(
